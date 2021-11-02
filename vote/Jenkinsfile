@@ -30,7 +30,13 @@ pipeline {
 
     post{
         always{
-            echo 'Send to slack...'
+            echo 'Build finished...'
+        }
+        failure{
+            echo 'Boo... we failed =('
+        }
+        success{
+            echo 'Yay! success =)'
         }
     }
 }

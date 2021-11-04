@@ -5,6 +5,12 @@ pipeline {
 
     stages {
         stage("build"){
+            agent {
+                docker {
+                    image 'python:2.7.16-slim'
+                    args '--user root'
+                }
+            }
             when {
                 changeset "**/vote/**"
             }
@@ -16,6 +22,12 @@ pipeline {
             }
         }
         stage("test"){
+            agent {
+                docker {
+                    image 'python:2.7.16-slim'
+                    args '--user root'
+                }
+            }
             when {
                 changeset "**/vote/**"
             }
@@ -23,6 +35,18 @@ pipeline {
                 echo 'Running unit Tests on vote app'
                 dir('vote') {
                     sh 'nosetests -v'
+                }
+            }
+        }
+        stage("docker-package"){
+            agent any
+            when{
+                changeset '**/vote/**'
+            }
+            steps{
+                echo 'Packaging vote with docker'
+                script {
+                    def voteImage = docker.build("vote:v${env.BUILD_ID}", "./vote/")
                 }
             }
         }
